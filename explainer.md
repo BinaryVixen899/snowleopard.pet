@@ -1,3 +1,4 @@
+```
 //! Default Compute@Edge template program.
 import snepPage from "./welcome-to-compute@snep.html"
 //importing an HTML Page
@@ -67,3 +68,4 @@ async function handleRequest(event) {
     status: 404,
   });
 }
+```
