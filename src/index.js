@@ -22,36 +22,49 @@ async function handleRequest(event) {
     });
   }
 
-  let url = new URL(req.url);
+  //Apex Redirect 
+    // Get the host header from the request
+    const host = req.headers.get("Host");
 
+    // If the host header is set, and does not start with 'www.'...
+    if (host && !host.startsWith("www.")) {
+      // Construct a synthetic response (permanent redirect)
+      let resp = new Response(null, {
+        headers: new Headers({
+          Location: "www." + host,
+          "Cache-Control": "max-age=86400",
+        }),
+        status: 301,
+        url: req.url,
+      });
+
+      // Send the constructed response, and return
+      return resp;
+    }
+
+  let url = new URL(req.url);
   // If request is to the `/` path...
   if (url.pathname == "/") {
     const req = event.request;
-    let mowable = req.headers.get('user-agent')
-    
-      if (mowable === 'mow')
-      {
-        console.log("Mow detected")
-        let resp = new Response( null, {
-           headers: new Headers({ 'Location': 'https://homph.snowme.ws/'
-           }),
-           status: 302,
-           url: req.url
-         });
-    
-        return resp
-      }
-      else
-      {
-        let resp = new Response(snepPage, {
-          headers: new Headers({ "Content-Type": "text/html; charset=utf-8" }),
-          status: 200
-        })
-        return resp
-      }
-  
+    let mowable = req.headers.get("user-agent");
+
+    if (mowable === "mow") {
+      console.log("Mow detected");
+      let resp = new Response(null, {
+        headers: new Headers({ Location: "https://homph.snowme.ws/" }),
+        status: 302,
+        url: req.url,
+      });
+
+      return resp;
+    } else {
+      let resp = new Response(snepPage, {
+        headers: new Headers({ "Content-Type": "text/html; charset=utf-8" }),
+        status: 200,
+      });
+      return resp;
+    }
   }
-  
 
   // Catch all other requests and return a 404.
   return new Response("The page you requested could not be found", {
